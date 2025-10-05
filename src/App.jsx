@@ -1,72 +1,64 @@
-const CardItem = () => (
-  <div className="flex border-dashed border-sky-500 border p-4 rounded-lg cursor-pointer hover:shadow-xl transition-shadow duration-300">
-    <img
-      className="w-32 h-32 object-cover rounded-lg"
-      src="https://plus.unsplash.com/premium_photo-1706024554526-a564f2f29879?w=512"
-    />
-    <div className="ml-4 flex flex-col justify-between grow">
-      <div>
-        <h4 className="font-bold text-green-600">Grassy Lemonade</h4>
-        <p className="text-slate-500 text-sm">
-          Fresh lemongrass shooting your day
-        </p>
-      </div>
-      <div className="flex justify-between">
-        <div className="rating">
-          <input
-            type="radio"
-            name="rating-2"
-            className="mask mask-star-2 bg-orange-400"
-            aria-label="1 star"
-          />
-          <input
-            type="radio"
-            name="rating-2"
-            className="mask mask-star-2 bg-orange-400"
-            aria-label="2 star"
-            defaultChecked
-          />
-          <input
-            type="radio"
-            name="rating-2"
-            className="mask mask-star-2 bg-orange-400"
-            aria-label="3 star"
-          />
-          <input
-            type="radio"
-            name="rating-2"
-            className="mask mask-star-2 bg-orange-400"
-            aria-label="4 star"
-          />
-          <input
-            type="radio"
-            name="rating-2"
-            className="mask mask-star-2 bg-orange-400"
-            aria-label="5 star"
-          />
-        </div>
-        <span>Rp 17,000</span>
-      </div>
-    </div>
-  </div>
-);
+import { collection, onSnapshot, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import Cart from "./Cart";
+import { MenuItem } from "./MenuItem";
+import { firestore } from "./service/firebase";
+import { useActiveOrder, usePickUpPoint } from "./service/hooks";
+import Onboard from "./Onboard";
+import { FirestoreDate } from "./utils";
+import PickUpInfo from "./PickUpInfo";
 
 function App() {
+  const [menus, setMenus] = useState([]);
+  const pickUpPoint = usePickUpPoint();
+  const [order, setOrder] = useActiveOrder();
+  const addOrder = (menu) => {
+    const items = [...order.items];
+    const item = items.find((item) => item.id === menu.id);
+    if (item) {
+      item.qty = item.qty + 1;
+      console.log(item);
+    } else {
+      items.push({
+        qty: 1,
+        ...menu,
+      });
+    }
+    setOrder({ ...order, items });
+  };
+  useEffect(() => {
+    const q = query(collection(firestore, "Menu"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const items = [];
+      querySnapshot.forEach((doc) => {
+        items.push({ id: doc.id, ...doc.data() });
+      });
+      setMenus(items);
+    });
+
+    return () => unsubscribe();
+  }, []);
+  if (!pickUpPoint) {
+    return (
+      <div>
+        <h1>Selamat Datang di Dapur Ibunza</h1>
+      </div>
+    );
+  }
+  if (!order.id) {
+    return <Onboard />;
+  }
   return (
-    <div className="sm:w-full lg:container p-8 m-auto border h-[100vh] border-sky-500">
-      <h1 className="text-2xl">Fast Order</h1>
-      <h2 className="text-xl mt-4">Beverages</h2>
+    <div className="sm:w-full lg:container p-8 m-auto mb-32">
+      <h1 className="text-3xl font-bold text-pink-600">IBUNZA</h1>
+      <h2>Hallo {order.name}, Silahkan dipilih</h2>
+      <PickUpInfo pickUpPoint={pickUpPoint} />
       <div className="w-full mt-2 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
-        <CardItem />
+        {menus.map((menu) => (
+          <MenuItem key={menu.id} menu={menu} onClick={addOrder} />
+        ))}
       </div>
-      <div className="fixed bg-green-700 text-white  bottom-2 left-0 flex w-full lg:w-100 h-16 justify-center items-center rounded-full">
-        <span className="text-2xl">Place Order</span>
-      </div>
+      <Cart pickUpPoint={pickUpPoint} />
     </div>
   );
 }
