@@ -40,23 +40,23 @@ const Cart = ({ pickUpPoint }) => {
       style={
         open
           ? {
-              backgroundColor: "white",
-              border: "1px solid green",
-              top: 25,
-              bottom: 25,
-              left: 25,
-              right: 25,
-              overflowY: "auto",
-            }
+            backgroundColor: "white",
+            border: "1px solid green",
+            top: 25,
+            bottom: 25,
+            left: 25,
+            right: 25,
+            overflowY: "auto",
+          }
           : {
-              backgroundColor: "transparent",
-              border: "1px solid transparent",
-              top: window.innerHeight - 115,
-              bottom: 25,
-              left: 25,
-              right: 25,
-              overflowY: "hidden",
-            }
+            backgroundColor: "transparent",
+            border: "1px solid transparent",
+            top: window.innerHeight - 115,
+            bottom: 25,
+            left: 25,
+            right: 25,
+            overflowY: "hidden",
+          }
       }
     >
       <div className="p-4 flex">
@@ -80,7 +80,7 @@ const Cart = ({ pickUpPoint }) => {
             className="btn btn-xl bg-red-600 text-white"
             onClick={clearCart}
           >
-            Reset
+            Batal
           </button>
         )}
         <button className="btn btn-xl rounded-r-full bg-blue-400 text-white">

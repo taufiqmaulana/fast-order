@@ -6,6 +6,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 
 export function usePickUpPoint() {
   const [pickUpPoint, setPickUpPoint] = useState(null);
+  const [_, setOrder] = useActiveOrder();
 
   useEffect(() => {
     const loadPickUpPoint = async () => {
@@ -15,9 +16,16 @@ export function usePickUpPoint() {
         window.location.pathname.replace("/", ""),
       );
       const ppSnap = await getDoc(ref);
-      if (ppSnap.exists()) {
-        setPickUpPoint(ppSnap.data());
+      if (!ppSnap.exists()) {
+        setOrder({ items: [] });
+        return;
       }
+      const pp = ppSnap.data();
+      if (!pp.Open) {
+        setOrder({ items: [] });
+        return;
+      }
+      setPickUpPoint(pp);
     };
 
     loadPickUpPoint();

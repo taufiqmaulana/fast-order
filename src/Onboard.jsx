@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useActiveOrder, usePickUpPoint } from "./service/hooks";
 import { addDoc, collection, doc } from "firebase/firestore";
 import { firestore } from "./service/firebase";
+import PickUpInfo from "./PickUpInfo";
+import { ArrowRightCircle } from "lucide-react";
 
 const Onboard = () => {
   const pickUpPoint = usePickUpPoint();
@@ -28,27 +30,33 @@ const Onboard = () => {
     });
   };
   return (
-    <div className="container m-auto">
-      <h1>Selamat Datang di Dapur Ibunza</h1>
-      <p>Pesanannya atas nama siapa?</p>
-      <input
-        className="input"
-        placeholder="Nama"
-        value={onboard.name}
-        onChange={(e) => setOnboard({ ...onboard, name: e.target.value })}
-      />
-      <p>Boleh dibantu nomor telponnya apablia berkenan?</p>
-      <input
-        className="input"
-        placeholder="No. Handphone"
-        onChange={(e) => setOnboard({ ...onboard, phone: e.target.value })}
-      />
-      <button
-        onClick={createOrder}
-        className="btn block bg-green-500 text-white mt-4"
-      >
-        Lanjutkan
-      </button>
+    <div className="card bg-base-100 max-w-3xl shadow-sm m-8 lg:m-auto">
+      <div className="card-body">
+        <h1 className="text-3xl font-bold text-pink-600">IBUNZA</h1>
+        <h2 className="">Selamat Datang</h2>
+        <p>Pesanannya atas nama siapa?</p>
+        <input
+          className="input"
+          placeholder="Nama"
+          value={onboard.name}
+          onChange={(e) => setOnboard({ ...onboard, name: e.target.value })}
+        />
+        <p>Boleh dibantu nomor telponnya apablia berkenan?</p>
+        <input
+          className="input"
+          placeholder="No. Handphone"
+          onChange={(e) => setOnboard({ ...onboard, phone: e.target.value })}
+        />
+        <PickUpInfo pickUpPoint={pickUpPoint} />
+        <div className="card-actions justify-center">
+          <button
+            onClick={createOrder}
+            className="btn btn-lg rounded-r-full rounded-l-full bg-green-500 text-white mt-4"
+          >
+            Pilih Menu <ArrowRightCircle />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { FirestoreDate } from "./utils";
 
 const PickUpInfo = ({ pickUpPoint }) => {
+  if (!pickUpPoint) return "";
   return (
     <div className="py-2 px-3 my-4 block border border-slate-200 shadow bg-slate-50 rounded-lg">
       <h3>
