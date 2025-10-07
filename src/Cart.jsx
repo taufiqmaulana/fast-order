@@ -4,13 +4,15 @@ import { ArrowLeftCircle, Clock10, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import PickUpInfo from "./PickUpInfo";
 import { firestore } from "./service/firebase";
+import { Plus } from "lucide-react";
+import { Minus } from "lucide-react";
 
 const Cart = ({ pickUpPoint }) => {
   const [open, setOpen] = useState(false);
   const [order, setOrder] = useLocalStorage("order");
   const [orderHistory, setOrderHistory] = useLocalStorage("history", []);
   const placeOrder = async () => {
-    if (order.items.length === 0) return;
+    if (!confirm("Pastikan pesanan sudah sesuai, lanjutkan pemesanan?")) return;
     const batch = writeBatch(firestore);
     const orderDoc = collection(firestore, "OrderItem");
     order.items.forEach((item) => {
@@ -22,11 +24,20 @@ const Cart = ({ pickUpPoint }) => {
     });
     await batch.commit();
     setOrderHistory([...orderHistory, { ...order }]);
-    clearCart();
-  };
-  const clearCart = () => {
     setOrder({ items: [] });
   };
+  const clearCart = () => {
+    if (confirm("Apakah anda yakin akan membatalkan pesanan?")) {
+      setOrder({ items: [] });
+    }
+  };
+  const updQty = (i, sup) => {
+    const items = [...order.items];
+    const qty = items[i].qty + sup;
+    items[i].qty = qty > -1 ? qty : 0;
+    setOrder({ ...order, items });
+  };
+
   const totalItems = order.items
     .map((item) => item.qty)
     .reduce((a, b) => a + b, 0);
@@ -36,7 +47,7 @@ const Cart = ({ pickUpPoint }) => {
 
   return (
     <div
-      className="card fixed transition-all duration-1000 ease-in-out"
+      className="card fixed max-w-3xl transition-all duration-1000 ease-in-out z-[100]"
       style={
         open
           ? {
@@ -59,9 +70,10 @@ const Cart = ({ pickUpPoint }) => {
           }
       }
     >
-      <div className="p-4 flex">
+      <div className="p-4 flex justify-between">
         <button
-          className="btn btn-xl rounded-l-full grow bg-green-600 text-white"
+          id="cart-main"
+          className="btn btn-xl rounded-full bg-green-600 text-white"
           onClick={() => setOpen(!open)}
         >
           {open ? (
@@ -69,27 +81,19 @@ const Cart = ({ pickUpPoint }) => {
           ) : (
             <>
               <ShoppingCart />
-              <div className="badge badge-sm">
-                {totalItems < 100 ? totalItems : "+99"}
-              </div>
+              <span>{totalItems < 100 ? totalItems : "+99"}</span>
             </>
           )}
         </button>
-        {open && (
-          <button
-            className="btn btn-xl bg-red-600 text-white"
-            onClick={clearCart}
-          >
-            Batal
+        {!open && (
+          <button className="btn btn-xl rounded-full bg-blue-400 text-white">
+            <Clock10 /> <span className="hidden md:inline">History</span>
           </button>
         )}
-        <button className="btn btn-xl rounded-r-full bg-blue-400 text-white">
-          <Clock10 /> <span className="hidden md:inline">History</span>
-        </button>
       </div>
       <div className="card-body">
         <h5>Keranjang Anda</h5>
-        <table className="table">
+        <table className="table table-sm p-0">
           <thead>
             <tr>
               <th>Item</th>
@@ -98,10 +102,14 @@ const Cart = ({ pickUpPoint }) => {
             </tr>
           </thead>
           <tbody>
-            {order.items.map((item) => (
+            {order.items.map((item, i) => (
               <tr key={item.id}>
-                <td>{item.Menu}</td>
-                <td>{item.qty}</td>
+                <td><h4 className="font-bold text-green-600">#{i + 1}&nbsp;{item.Menu}</h4></td>
+                <td className="flex items-center justify-between">
+                  <button className="btn btn-xs rounded-full" onClick={() => updQty(i, -1)}><Minus size={10} /></button>
+                  <span className="mx-1">{item.qty}</span>
+                  <button className="btn btn-xs rounded-full" onClick={() => updQty(i, 1)}><Plus size={10} /></button>
+                </td>
                 <td>Rp. {item.qty * item.Price}</td>
               </tr>
             ))}
@@ -109,19 +117,27 @@ const Cart = ({ pickUpPoint }) => {
           <tfoot>
             <tr>
               <td>Total</td>
-              <td>{totalItems}</td>
-              <td>Rp. {totalPrice}</td>
+              <td className="text-md">{totalItems}</td>
+              <td className="text-md">Rp. {totalPrice}</td>
             </tr>
           </tfoot>
         </table>
         <PickUpInfo pickUpPoint={pickUpPoint} />
         {totalItems > 0 && (
-          <button
-            className="btn btn-xl bg-green-600 text-white"
-            onClick={placeOrder}
-          >
-            Order Sekarang
-          </button>
+          <>
+            <button
+              className="btn btn-lg rounded-full bg-green-600 text-white"
+              onClick={placeOrder}
+            >
+              Order
+            </button>
+            <button
+              className="btn btn-lg btn-outline rounded-full text-red-600"
+              onClick={clearCart}
+            >
+              Batalkan
+            </button>
+          </>
         )}
       </div>
     </div>

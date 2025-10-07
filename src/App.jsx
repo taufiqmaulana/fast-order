@@ -6,8 +6,10 @@ import Onboard from "./Onboard";
 import PickUpInfo from "./PickUpInfo";
 import { firestore } from "./service/firebase";
 import { useActiveOrder, usePickUpPoint } from "./service/hooks";
+import WelcomePage from "./Welcome";
 
 function App() {
+  const [landing, setLanding] = useState(true);
   const [menus, setMenus] = useState([]);
   const pickUpPoint = usePickUpPoint();
   const [order, setOrder] = useActiveOrder();
@@ -36,22 +38,18 @@ function App() {
 
     return () => unsubscribe();
   }, []);
-  if (!pickUpPoint) {
-    return (
-      <div>
-        <h1>Selamat Datang di Dapur Ibunza</h1>
-      </div>
-    );
+  if (landing) {
+    return <WelcomePage pickUpPoint={pickUpPoint} onOrder={() => setLanding(false)} />;
   }
   if (!order.id) {
     return <Onboard />;
   }
   return (
-    <div className="sm:w-full lg:container p-8 m-auto mb-32">
+    <div className="max-w-3xl p-5 sm:p-8 m-auto mb-32">
       <h1 className="text-3xl font-bold text-pink-600">IBUNZA</h1>
-      <h2>Hallo {order.name}, Silahkan dipilih menunya</h2>
+      <h2>Hallo <b className="text-green-600">{order.name}</b>, Silahkan dipilih menunya</h2>
       <PickUpInfo pickUpPoint={pickUpPoint} />
-      <div className="w-full mt-2 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="w-full mt-2 flex flex-col space-y-4">
         {menus.map((menu) => (
           <MenuItem key={menu.id} menu={menu} onClick={addOrder} />
         ))}

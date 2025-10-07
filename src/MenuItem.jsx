@@ -1,90 +1,120 @@
 import { PlusCircleIcon } from "lucide-react";
 import { useRef } from "react";
-import { useState } from "react";
+
+const Rating = ({ value }) => (
+  <div className="rating">
+    <div
+      className="mask mask-star-2 bg-orange-400"
+      aria-label="1 star"
+      aria-current={value === 1}
+    ></div>
+    <div
+      className="mask mask-star-2 bg-orange-400"
+      aria-label="2 star"
+      aria-current={value === 2}
+    ></div>
+    <div
+      className="mask mask-star-2 bg-orange-400"
+      aria-label="3 star"
+      aria-current={value === 3}
+    ></div>
+    <div
+      className="mask mask-star-2 bg-orange-400"
+      aria-label="4 star"
+      aria-current={value === 4}
+    ></div>
+    <div
+      className="mask mask-star-2 bg-orange-400"
+      aria-label="5 star"
+      aria-current={value === 5}
+    ></div>
+  </div>
+)
 
 export const MenuItem = ({ menu, onClick }) => {
-  const [throwing, setThrowing] = useState(false);
-  const ref = useRef();
+  const refThumb = useRef();
   const atcEffect = () => {
-    setThrowing(true);
-    setTimeout(() => {
-      ref.current.classList.add("hidden");
-      setThrowing(false);
-      setTimeout(() => {
-        ref.current.classList.remove("hidden");
-      }, 100);
-    }, 500);
+    const movableObject = refThumb.current;
+    const absoluteContainer = document.getElementById("cart-main");
+    // Get current position and dimensions
+    const currentRect = movableObject.getBoundingClientRect();
+    const absoluteRect = absoluteContainer.getBoundingClientRect();
+
+    // Calculate positions relative to viewport
+    const startX = currentRect.left + window.scrollX;
+    const startY = currentRect.top + window.scrollY;
+
+    const endX = absoluteRect.left + (absoluteRect.width - currentRect.width) / 2 + window.scrollX;
+    const endY = absoluteRect.top + (absoluteRect.height - currentRect.height) / 2 + window.scrollY;
+
+    // Create animation element
+    const clone = movableObject.cloneNode(true);
+    clone.style.position = 'fixed';
+    clone.style.top = `${startY}px`;
+    clone.style.left = `${startX}px`;
+    clone.style.margin = '0';
+    clone.style.zIndex = '50';
+    document.body.appendChild(clone);
+
+    // Animate the clone
+    const duration = 1500; // ms
+    const startTime = performance.now();
+
+    function animate(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Ease-out cubic animation
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+      const currentX = startX + (endX - startX) * easeProgress;
+      const currentY = startY + (endY - startY) * easeProgress;
+
+      clone.style.left = `${currentX}px`;
+      clone.style.top = `${currentY}px`;
+      clone.style.transform = `scale(${1 - (1 - .3) * (progress / 0.5)}) rotate(${-360 * easeProgress}deg)`
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        document.body.removeChild(clone);
+      }
+    }
+
+    requestAnimationFrame(animate);
   };
+
   const handleOnClick = () => {
     atcEffect();
     onClick(menu);
   };
+
   if (!menu) return "";
   return (
-    <div className="flex p-2 rounded-lg cursor-pointer shadow hover:shadow-xl transition-shadow duration-300">
-      <img className="w-32 h-32 object-cover rounded-lg" src={menu.Thumb} />
-      <img
-        ref={ref}
-        className="w-32 h-32 object-cover rounded-lg transition-all absolute duration-500 ease-in"
-        src={menu.Thumb}
-        style={
-          throwing
-            ? {
-                translate: "50% " + (window.innerHeight - 360) + "px",
-                scale: 0.3,
-                zIndex: 100,
-              }
-            : {}
-        }
-      />
-      <div className="ml-4 flex flex-col justify-between grow">
+    <div className="flex p-4 rounded-lg shadow hover:shadow-xl bg-white transition-shadow duration-300">
+      <div className="mr-4 flex flex-col justify-between grow">
         <div>
           <h4 className="font-bold text-green-600">{menu.Menu}</h4>
           <p className="text-slate-500 text-sm">{menu.Description}</p>
         </div>
         <div className="flex flex-col justify-between">
-          <div className="rating">
-            <div
-              className="mask mask-star-2 bg-orange-400"
-              aria-label="1 star"
-              aria-current={menu.Rating === 1}
-            ></div>
-            <div
-              className="mask mask-star-2 bg-orange-400"
-              aria-label="2 star"
-              aria-current={menu.Rating === 2}
-            ></div>
-            <div
-              className="mask mask-star-2 bg-orange-400"
-              aria-label="3 star"
-              aria-current={menu.Rating === 3}
-            ></div>
-            <div
-              className="mask mask-star-2 bg-orange-400"
-              aria-label="4 star"
-              aria-current={menu.Rating === 4}
-            ></div>
-            <div
-              className="mask mask-star-2 bg-orange-400"
-              aria-label="5 star"
-              aria-current={menu.Rating === 5}
-            ></div>
-          </div>
-          <div className="flex justify-between items-center">
-            <div>
-              <small className="text-slate-500 mr-1">Rp</small>
-              <span className="text-lg font-semibold text-slate-600">
-                {menu.Price / 1000}k
-              </span>
-            </div>
-            <button
-              onClick={handleOnClick}
-              className="btn rounded-r-full rounded-l-full bg-green-500 text-white"
-            >
-              Add <PlusCircleIcon />
-            </button>
+          <Rating value={menu.Rating} />
+          <div>
+            <small className="text-slate-500 mr-1">Rp</small>
+            <span className="text-lg font-semibold text-slate-600">
+              {menu.Price / 1000}k
+            </span>
           </div>
         </div>
+      </div>
+      <div className="relative hover:shadow-xl">
+        <img ref={refThumb} className="w-32 h-32 object-cover rounded-lg" src={menu.Thumb} />
+        <button
+          onClick={handleOnClick}
+          className="btn rounded-r-full rounded-l-full bg-green-500 text-white top-24 left-5 absolute"
+        >
+          Add <PlusCircleIcon />
+        </button>
       </div>
     </div>
   );

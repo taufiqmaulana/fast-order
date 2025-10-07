@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Move Object with Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Relative container (source) */
+        .relative-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background-color: #e0f7fa;
+            border: 2px dashed #006064;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Absolute container (destination) */
+        .absolute-container {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            width: 150px;
+            height: 150px;
+            background-color: #f3e5f5;
+            border: 2px solid #7b1fa2;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Movable object */
+        .movable-object {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .movable-object:hover {
+            transform: scale(1.1);
+        }
+
+        /* Instructions */
+        .instructions {
+            margin-top: 200px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-radius: 8px;
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Source container (relative positioning) -->
+    <div class="relative-container">
+        <div class="movable-object" id="movableObject"></div>
+    </div>
+
+    <!-- Destination container (absolute positioning) -->
+    <div class="absolute-container" id="absoluteContainer"></div>
+
+    <div class="instructions">
+        <p>👆 Click the purple circle to move it to the absolute container!</p>
+        <p>Click again to move it back to the relative container.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const movableObject = document.getElementById('movableObject');
+            const relativeContainer = document.querySelector('.relative-container');
+            const absoluteContainer = document.getElementById('absoluteContainer');
+            let isInRelative = true; // Track current position
+
+            movableObject.addEventListener('click', () => {
+                // Get current position and dimensions
+                const currentRect = movableObject.getBoundingClientRect();
+                const relativeRect = relativeContainer.getBoundingClientRect();
+                const absoluteRect = absoluteContainer.getBoundingClientRect();
+
+                // Calculate positions relative to viewport
+                const startX = currentRect.left + window.scrollX;
+                const startY = currentRect.top + window.scrollY;
+
+                let endX, endY;
+                if (isInRelative) {
+                    // Move to absolute container center
+                    endX = absoluteRect.left + (absoluteRect.width - currentRect.width) / 2 + window.scrollX;
+                    endY = absoluteRect.top + (absoluteRect.height - currentRect.height) / 2 + window.scrollY;
+                } else {
+                    // Move back to relative container center
+                    endX = relativeRect.left + (relativeRect.width - currentRect.width) / 2 + window.scrollX;
+                    endY = relativeRect.top + (relativeRect.height - currentRect.height) / 2 + window.scrollY;
+                }
+
+                // Create animation element
+                const clone = movableObject.cloneNode(true);
+                clone.style.position = 'fixed';
+                clone.style.top = `${startY}px`;
+                clone.style.left = `${startX}px`;
+                clone.style.margin = '0';
+                clone.style.zIndex = '1000';
+                document.body.appendChild(clone);
+
+                // Remove original element
+                movableObject.style.display = 'none';
+
+                // Animate the clone
+                const duration = 600; // ms
+                const startTime = performance.now();
+
+                function animate(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    // Ease-out cubic animation
+                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+                    const currentX = startX + (endX - startX) * easeProgress;
+                    const currentY = startY + (endY - startY) * easeProgress;
+
+                    clone.style.left = `${currentX}px`;
+                    clone.style.top = `${currentY}px`;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Animation complete - move to final container
+                        if (isInRelative) {
+                            absoluteContainer.appendChild(movableObject);
+                        } else {
+                            relativeContainer.appendChild(movableObject);
+                        }
+
+                        // Reset styles and show original
+                        movableObject.style.display = 'block';
+                        document.body.removeChild(clone);
+                        isInRelative = !isInRelative;
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            });
+        });
+    </script>
+</body>
+
+</html>
