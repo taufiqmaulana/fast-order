@@ -22,6 +22,7 @@ function App() {
     } else {
       items.push({
         qty: 1,
+        id,
         Menu,
         Price,
       });
