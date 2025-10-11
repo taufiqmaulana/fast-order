@@ -6,8 +6,9 @@ import PickUpInfo from "./PickUpInfo";
 import { firestore } from "./service/firebase";
 import { Plus } from "lucide-react";
 import { Minus } from "lucide-react";
+import { Home } from "lucide-react";
 
-const Cart = ({ pickUpPoint }) => {
+const Cart = ({ pickUpPoint, onClickHistory }) => {
   const [open, setOpen] = useState(false);
   const [order, setOrder] = useLocalStorage("order");
   const [orderHistory, setOrderHistory] = useLocalStorage("history", []);
@@ -25,6 +26,7 @@ const Cart = ({ pickUpPoint }) => {
     await batch.commit();
     setOrderHistory([...orderHistory, { ...order }]);
     setOrder({ items: [] });
+    onClickHistory();
   };
   const clearCart = () => {
     if (confirm("Apakah anda yakin akan membatalkan pesanan?")) {
@@ -47,27 +49,27 @@ const Cart = ({ pickUpPoint }) => {
 
   return (
     <div
-      className="card fixed max-w-3xl transition-all duration-1000 ease-in-out z-[100]"
+      className="card fixed max-w-3xl m-auto transition-all duration-1000 ease-in-out z-[100]"
       style={
         open
           ? {
-            backgroundColor: "white",
-            border: "1px solid green",
-            top: 25,
-            bottom: 25,
-            left: 25,
-            right: 25,
-            overflowY: "auto",
-          }
+              backgroundColor: "white",
+              border: "1px solid green",
+              top: 25,
+              bottom: 25,
+              left: 25,
+              right: 25,
+              overflowY: "auto",
+            }
           : {
-            backgroundColor: "transparent",
-            border: "1px solid transparent",
-            top: window.innerHeight - 115,
-            bottom: 25,
-            left: 25,
-            right: 25,
-            overflowY: "hidden",
-          }
+              backgroundColor: "transparent",
+              border: "1px solid transparent",
+              top: window.innerHeight - 115,
+              bottom: 25,
+              left: 25,
+              right: 25,
+              overflowY: "hidden",
+            }
       }
     >
       <div className="p-4 flex justify-between">
@@ -86,8 +88,11 @@ const Cart = ({ pickUpPoint }) => {
           )}
         </button>
         {!open && (
-          <button className="btn btn-xl rounded-full bg-blue-400 text-white">
-            <Clock10 /> <span className="hidden md:inline">History</span>
+          <button
+            className="btn btn-xl rounded-full bg-blue-400 text-white"
+            onClick={onClickHistory}
+          >
+            <Home /> <span className="hidden md:inline">History</span>
           </button>
         )}
       </div>
@@ -104,11 +109,25 @@ const Cart = ({ pickUpPoint }) => {
           <tbody>
             {order.items.map((item, i) => (
               <tr key={item.id}>
-                <td><h4 className="font-bold text-green-600">#{i + 1}&nbsp;{item.Menu}</h4></td>
+                <td>
+                  <h4 className="font-bold text-green-600">
+                    #{i + 1}&nbsp;{item.Menu}
+                  </h4>
+                </td>
                 <td className="flex items-center justify-between">
-                  <button className="btn btn-xs rounded-full" onClick={() => updQty(i, -1)}><Minus size={10} /></button>
+                  <button
+                    className="btn btn-xs rounded-full"
+                    onClick={() => updQty(i, -1)}
+                  >
+                    <Minus size={10} />
+                  </button>
                   <span className="mx-1">{item.qty}</span>
-                  <button className="btn btn-xs rounded-full" onClick={() => updQty(i, 1)}><Plus size={10} /></button>
+                  <button
+                    className="btn btn-xs rounded-full"
+                    onClick={() => updQty(i, 1)}
+                  >
+                    <Plus size={10} />
+                  </button>
                 </td>
                 <td>Rp. {item.qty * item.Price}</td>
               </tr>
