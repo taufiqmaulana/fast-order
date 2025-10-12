@@ -49,30 +49,29 @@ const Cart = ({ pickUpPoint, onClickHistory }) => {
 
   return (
     <div
-      className="card fixed max-w-3xl m-auto transition-all duration-1000 ease-in-out z-[100]"
+      className="fixed shadow-xl max-w-3xl m-auto transition-all glass duration-1000 ease-in-out z-[99]"
       style={
         open
           ? {
               backgroundColor: "white",
-              border: "1px solid green",
-              top: 25,
-              bottom: 25,
+              borderRadius: 40,
+              height: "calc(100vh - 50px)",
+              bottom: 20,
               left: 25,
               right: 25,
               overflowY: "auto",
             }
           : {
-              backgroundColor: "transparent",
-              border: "1px solid transparent",
-              top: window.innerHeight - 115,
-              bottom: 25,
+              borderRadius: 100,
+              height: 83,
+              bottom: 20,
               left: 25,
               right: 25,
               overflowY: "hidden",
             }
       }
     >
-      <div className="p-4 flex justify-between">
+      <div className="px-4 py-3 flex justify-between">
         <button
           id="cart-main"
           className="btn btn-xl rounded-full bg-green-600 text-white"

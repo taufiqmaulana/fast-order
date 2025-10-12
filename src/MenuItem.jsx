@@ -29,7 +29,7 @@ const Rating = ({ value }) => (
       aria-current={value === 5}
     ></div>
   </div>
-)
+);
 
 export const MenuItem = ({ menu, onClick }) => {
   const refThumb = useRef();
@@ -41,19 +41,21 @@ export const MenuItem = ({ menu, onClick }) => {
     const absoluteRect = absoluteContainer.getBoundingClientRect();
 
     // Calculate positions relative to viewport
-    const startX = currentRect.left + window.scrollX;
-    const startY = currentRect.top + window.scrollY;
+    const startX = currentRect.left;
+    const startY = currentRect.top;
 
-    const endX = absoluteRect.left + (absoluteRect.width - currentRect.width) / 2 + window.scrollX;
-    const endY = absoluteRect.top + (absoluteRect.height - currentRect.height) / 2 + window.scrollY;
+    const endX =
+      absoluteRect.left + (absoluteRect.width - currentRect.width) / 2;
+    const endY =
+      absoluteRect.top + (absoluteRect.height - currentRect.height) / 2;
 
     // Create animation element
     const clone = movableObject.cloneNode(true);
-    clone.style.position = 'fixed';
+    clone.style.position = "fixed";
     clone.style.top = `${startY}px`;
     clone.style.left = `${startX}px`;
-    clone.style.margin = '0';
-    clone.style.zIndex = '50';
+    clone.style.margin = "0";
+    clone.style.zIndex = "100";
     document.body.appendChild(clone);
 
     // Animate the clone
@@ -72,7 +74,7 @@ export const MenuItem = ({ menu, onClick }) => {
 
       clone.style.left = `${currentX}px`;
       clone.style.top = `${currentY}px`;
-      clone.style.transform = `scale(${1 - (1 - .3) * (progress / 0.5)}) rotate(${-360 * easeProgress}deg)`
+      clone.style.transform = `scale(${1 - (1 - 0.3) * (progress / 0.5)}) rotate(${-360 * easeProgress}deg)`;
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -92,7 +94,7 @@ export const MenuItem = ({ menu, onClick }) => {
   if (!menu) return "";
   return (
     <div className="flex p-4 rounded-lg shadow hover:shadow-xl bg-white transition-shadow duration-300">
-      <div className="mr-4 flex flex-col justify-between grow">
+      <div className="mr-2 flex flex-col justify-between grow">
         <div>
           <h4 className="font-bold text-green-600">{menu.Menu}</h4>
           <p className="text-slate-500 text-sm">{menu.Description}</p>
@@ -107,8 +109,16 @@ export const MenuItem = ({ menu, onClick }) => {
           </div>
         </div>
       </div>
-      <div className="relative hover:shadow-xl">
-        <img ref={refThumb} className="w-32 h-32 object-cover rounded-lg" src={menu.Thumb} />
+      <div
+        className="relative hover:shadow-xl"
+        style={{ width: 128, height: 128 }}
+      >
+        <img
+          ref={refThumb}
+          className="object-cover rounded-lg"
+          style={{ width: 128, height: 128 }}
+          src={menu.Thumb}
+        />
         <button
           onClick={handleOnClick}
           className="btn rounded-r-full rounded-l-full bg-green-500 text-white top-24 left-5 absolute"
