@@ -1,3 +1,4 @@
+import { useClickAway } from "@uidotdev/usehooks";
 import { ArrowLeft } from "lucide-react";
 import { PlusCircleIcon } from "lucide-react";
 import { useState } from "react";
@@ -34,9 +35,11 @@ const Rating = ({ value }) => (
 );
 
 export const MenuItem = ({ menu, onClick }) => {
-  const refThumb = useRef();
   const [showVariant, setShowVariant] = useState(false);
-  const atcEffect = () => {
+  const refThumb = useRef();
+  const refVar = useClickAway(() => setShowVariant(false));
+
+  const atcEffect = (onComplete) => {
     const movableObject = refThumb.current;
     const absoluteContainer = document.getElementById("cart-main");
     // Get current position and dimensions
@@ -62,7 +65,7 @@ export const MenuItem = ({ menu, onClick }) => {
     document.body.appendChild(clone);
 
     // Animate the clone
-    const duration = 1500; // ms
+    const duration = 1000; // ms
     const startTime = performance.now();
 
     function animate(currentTime) {
@@ -83,6 +86,7 @@ export const MenuItem = ({ menu, onClick }) => {
         requestAnimationFrame(animate);
       } else {
         document.body.removeChild(clone);
+        onComplete();
       }
     }
 
@@ -91,14 +95,13 @@ export const MenuItem = ({ menu, onClick }) => {
 
   const handleOnClick = () => {
     setShowVariant(false);
-    atcEffect();
-    onClick(menu);
+    atcEffect(() => onClick(menu));
   };
 
   if (!menu) return "";
   return (
-    <div className="p-4 rounded-lg justify-between shadow hover:shadow-xl bg-white transition-shadow duration-300 relative overflow-hidden">
-      <div className="flex">
+    <div className="p-4 rounded-lg shadow hover:shadow-xl bg-white transition-shadow duration-300 relative overflow-hidden">
+      <div className="flex justify-between">
         <div className="mr-2 flex flex-col justify-between grow max-w-50">
           <div>
             <h4 className="font-bold text-green-600">{menu.Menu}</h4>
@@ -132,7 +135,7 @@ export const MenuItem = ({ menu, onClick }) => {
           </button>
         </div>
       </div>
-      <div className="flex bg-white p-4 justify-between space-x-4 absolute top-0 right-0 left-0 transition-all duration-500 ease-in-out" style={{ top: showVariant ? 0 : 155 }}>
+      <div className="flex bg-white p-4 justify-between space-x-4 absolute top-0 right-0 left-0 transition-all duration-500 ease-in-out" ref={refVar} style={{ top: showVariant ? 0 : 155 }}>
         <div className="flex flex-col space-y-2">
           <button className="btn btn-warning btn-xs" onClick={() => setShowVariant(false)}><ArrowLeft size={12} /></button>
           <h4 className="font-bold text-green-600 text-xs">{menu.Menu}</h4>

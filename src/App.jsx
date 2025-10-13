@@ -50,7 +50,7 @@ function App() {
     );
   }
   if (!order.id) {
-    return <Onboard />;
+    return <Onboard onHome={() => setLanding(true)} />;
   }
   return (
     <div className="max-w-3xl p-5 sm:p-8 m-auto mb-32">

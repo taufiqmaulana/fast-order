@@ -4,8 +4,10 @@ import { addDoc, collection, doc } from "firebase/firestore";
 import { firestore } from "./service/firebase";
 import PickUpInfo from "./PickUpInfo";
 import { ArrowRightCircle } from "lucide-react";
+import { ArrowLeftCircle } from "lucide-react";
+import { Home } from "lucide-react";
 
-const Onboard = () => {
+const Onboard = ({ onHome }) => {
   const pickUpPoint = usePickUpPoint();
   const [_, setOrder] = useActiveOrder();
   const [onboard, setOnboard] = useState({ name: "", phone: "" });
@@ -50,6 +52,12 @@ const Onboard = () => {
           />
           <PickUpInfo pickUpPoint={pickUpPoint} />
           <div className="card-actions justify-center">
+            <button
+              onClick={onHome}
+              className="btn btn-lg rounded-r-full rounded-l-full bg-blue-400 text-white mt-4"
+            >
+              <Home />
+            </button>
             <button
               onClick={createOrder}
               className="btn btn-lg rounded-r-full rounded-l-full bg-green-500 text-white mt-4"

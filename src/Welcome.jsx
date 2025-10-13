@@ -65,38 +65,36 @@ export default function WelcomePage({ pickUpPoint, onOrder }) {
               key={h.id}
               className="py-2 px-3 my-4 block border border-slate-200 shadow bg-slate-50 rounded-lg"
             >
-              <h4 className="text-green-600 font-bold">{h.name}</h4>
-              <table className="table table-sm p-0">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Qty.</th>
-                    <th>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {h.items.map((item, i) => (
-                    <tr key={item.id}>
-                      <td>
-                        <h4 className="font-bold text-green-600">
-                          #{i + 1}&nbsp;{item.Menu}
-                        </h4>
-                      </td>
-                      <td>
-                        <span className="mx-1">{item.qty}</span>
-                      </td>
-                      <td>Rp. {item.qty * item.Price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td>Total</td>
-                    <td className="text-md">{totalItems}</td>
-                    <td className="text-md">Rp. {totalPrice}</td>
-                  </tr>
-                </tfoot>
-              </table>
+              <h4 className="text-green-600 font-bold p-2">{h.name}</h4>
+              <details className="collapse collapse-arrow bg-base-100 border-base-300 border">
+                <summary className="collapse-title font-semibold">{totalItems} Items, Rp. {totalPrice}</summary>
+                <div className="collapse-content text-sm p-0">
+                  <table className="table table-sm p-0">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Qty.</th>
+                        <th>Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {h.items.map((item, i) => (
+                        <tr key={item.id}>
+                          <td>
+                            <h4 className="font-bold text-green-600">
+                              #{i + 1}&nbsp;{item.Menu}
+                            </h4>
+                          </td>
+                          <td>
+                            <span className="mx-1">{item.qty}</span>
+                          </td>
+                          <td>Rp. {item.qty * item.Price}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
             </div>
           );
         })}
