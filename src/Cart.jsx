@@ -7,6 +7,8 @@ import { firestore } from "./service/firebase";
 import { Plus } from "lucide-react";
 import { Minus } from "lucide-react";
 import { Home } from "lucide-react";
+import { Trash } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 const Cart = ({ pickUpPoint, onClickHistory }) => {
   const [open, setOpen] = useState(false);
@@ -39,6 +41,11 @@ const Cart = ({ pickUpPoint, onClickHistory }) => {
     items[i].qty = qty > -1 ? qty : 0;
     setOrder({ ...order, items });
   };
+  const removeItem = (i) => {
+    const items = [...order.items];
+    items.splice(i, 1);
+    setOrder({ ...order, items });
+  }
 
   const totalItems = order.items
     .map((item) => item.qty)
@@ -53,22 +60,22 @@ const Cart = ({ pickUpPoint, onClickHistory }) => {
       style={
         open
           ? {
-              backgroundColor: "white",
-              borderRadius: 40,
-              height: "calc(100vh - 50px)",
-              bottom: 20,
-              left: 25,
-              right: 25,
-              overflowY: "auto",
-            }
+            backgroundColor: "white",
+            borderRadius: 40,
+            height: "calc(100vh - 50px)",
+            bottom: 20,
+            left: 25,
+            right: 25,
+            overflowY: "auto",
+          }
           : {
-              borderRadius: 100,
-              height: 83,
-              bottom: 20,
-              left: 25,
-              right: 25,
-              overflowY: "hidden",
-            }
+            borderRadius: 100,
+            height: 83,
+            bottom: 20,
+            left: 25,
+            right: 25,
+            overflowY: "hidden",
+          }
       }
     >
       <div className="px-4 py-3 flex justify-between">
@@ -110,16 +117,25 @@ const Cart = ({ pickUpPoint, onClickHistory }) => {
               <tr key={item.id}>
                 <td>
                   <h4 className="font-bold text-green-600">
-                    #{i + 1}&nbsp;{item.Menu}
+                    {item.Menu}
                   </h4>
                 </td>
                 <td className="flex items-center justify-between">
-                  <button
-                    className="btn btn-xs rounded-full"
-                    onClick={() => updQty(i, -1)}
-                  >
-                    <Minus size={10} />
-                  </button>
+                  {
+                    item.qty > 1
+                      ? <button
+                        className="btn btn-xs rounded-full"
+                        onClick={() => updQty(i, -1)}
+                      >
+                        <Minus size={10} />
+                      </button>
+                      : <button
+                        className="btn btn-error btn-outline btn-xs rounded-full"
+                        onClick={() => removeItem(i)}
+                      >
+                        <Trash2 size={10} />
+                      </button>
+                  }
                   <span className="mx-1">{item.qty}</span>
                   <button
                     className="btn btn-xs rounded-full"
