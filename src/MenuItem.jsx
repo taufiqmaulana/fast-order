@@ -94,7 +94,6 @@ export const MenuItem = ({ menu, onClick }) => {
   };
 
   const handleOnClick = () => {
-    setShowVariant(false);
     atcEffect(() => onClick(menu));
   };
 
@@ -129,7 +128,7 @@ export const MenuItem = ({ menu, onClick }) => {
           />
           <button
             onClick={() => setShowVariant(true)}
-            className="btn rounded-r-full rounded-l-full bg-green-500 text-white top-24 left-5 absolute"
+            className="btn rounded-r-full rounded-l-full bg-green-600 text-white top-24 left-5 absolute"
           >
             Add <PlusCircleIcon />
           </button>
@@ -151,7 +150,7 @@ export const MenuItem = ({ menu, onClick }) => {
               />
               <button
                 onClick={handleOnClick}
-                className="btn btn-sm rounded-r-full rounded-l-full bg-green-500 text-white mt-1"
+                className="btn btn-sm rounded-r-full rounded-l-full bg-green-600 text-white mt-1"
               >
                 Add <PlusCircleIcon />
               </button>
